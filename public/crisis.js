@@ -91,26 +91,40 @@
       scalefactor: loungeBaseScaleFactor,
       rewardValues: loungeRewardValues,
       loseMessage: "Your partner left you!",
+      speech: true,
+      characters: true,
       active: false,
       inputs: [
         {
           id: "talk1",
           icon: "heart",
-          classes: "right",
-          position: [0, 0]
+          classes: "",
+          position: [322, 171]
         },
         {
           id: "talk2",
-          icon: "heart",
-          classes: "left",
-          position: [65, 0]
+          icon: "pot",
+          classes: "",
+          position: [415, 171]
+        },
+        {
+          id: "talk3",
+          icon: "dining",
+          classes: "",
+          position: [322, 239]
+        },
+        {
+          id: "talk4",
+          icon: "kids",
+          classes: "",
+          position: [415, 239]
         },
       ],
       outputs: [
         {
           id: "talk-back",
           icon: "heart",
-          position: [0, 58]
+          position: [204, 254]
         },
       ],
       events: {
@@ -605,6 +619,7 @@
   ];
 
   let activeRoom;
+  // let activeRoomIndex = 0;
   let activeRoomIndex = Math.floor(Math.random() * rooms.length);
 
   function setup() {
@@ -631,6 +646,12 @@
         </div>
       `);
       room.container = room.display.find(`#${room.id}-container`);
+      if (room.characters) {
+        room.container.append(`<img class="characters" src="assets/${room.id}-characters.png"/>`)
+      }
+      if (room.speech) {
+        room.container.append(`<img class="speech" src="assets/${room.id}-speech.png"/>`)
+      }
       room.display.hide();
       if (room.setup) {
         room.setup();

@@ -36,7 +36,6 @@ body {
   position: absolute;
 }
 
-
 .right {
   -webkit-transform: rotate(-90deg);
   -moz-transform: rotate(-90deg);
@@ -63,4 +62,12 @@ body {
 
 .title {
   margin: 0px;
+}
+
+.characters {
+  position: absolute;
+}
+
+.speech {
+  position: absolute;
 }
