@@ -90,6 +90,7 @@
       counter: loungeBaseCounterValue * timeScale,
       scalefactor: loungeBaseScaleFactor,
       rewardValues: loungeRewardValues,
+      loseMessage: "Your partner left you!",
       active: false,
       inputs: [
         {
@@ -172,6 +173,7 @@
     {
       id: 'kitchen',
       name: 'Kitchen',
+      loseMessage: "Your kitchen blew up!",
       counter: kitchenBaseCounterValue * timeScale,
       active: false,
       intervals: kitchenAttentionTickIntervals,
@@ -259,6 +261,7 @@
     {
       id: 'dining',
       name: 'Dining',
+      loseMessage: "Your cat is evil!",
       counter: diningBaseCounterValue * timeScale,
       liftCounter: diningInitialLiftCounter,
       liftThreshold: diningLiftCounterThreshold,
@@ -340,6 +343,7 @@
     {
       id: 'kids',
       name: 'Kids Room',
+      loseMessage: "Where's my toy!?",
       counter: kidBaseCounterTicks * timeScale,
       active: false,
       toys: ['a', 'b', 'c', 'd', 'e'],
@@ -796,7 +800,9 @@
       for(var roomIndex = 0; roomIndex < rooms.length; roomIndex++) {
         rooms[roomIndex].update(delta, false);
       }
-      checkGameState();
+      if (!gameOver) {
+        checkGameState();
+      }
       accumulator = 0;
     } else {
       accumulator = accumulator + delta;
@@ -839,7 +845,9 @@
     for (let roomIndex = 0; roomIndex < rooms.length; roomIndex++) {
       let room = rooms[roomIndex];
       if (room.counter <= 0) {
-        scene.html("<h1>Game Over</h1>");
+        scene.html(`<h1>Game Over</h1><br/><h3><i>${room.loseMessage}</i></h3>`);
+        timerContainer.hide();
+        deadRoom = room.name;
         gameOver = true;
       }
     }
