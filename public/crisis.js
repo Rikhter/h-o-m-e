@@ -840,6 +840,7 @@
     }
   }
 
+  let deadRoom;
   let gameOver = false;
   function checkGameState() {
     for (let roomIndex = 0; roomIndex < rooms.length; roomIndex++) {
