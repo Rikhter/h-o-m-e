@@ -19,6 +19,10 @@ body {
   justify-content: space-around;
 }
 
+#scene {
+  position: relative;
+}
+
 .scene {
 
 }
