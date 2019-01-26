@@ -3,44 +3,44 @@
 
   // lounge
   let loungeBaseCounterValue = 50.0;
-  let loungeRewardValues = [1, 2, 3];
-  let loungeBaseScaleFactor = 1;
-  let loungeScaleFactorIncrement = 1;
-  let loungeTalkEventDelay = 2;
+  let loungeRewardValues = [5, 6, 7, 8, 8, 8, 9, 10, 11];
+  let loungeBaseScaleFactor = 3;
+  let loungeScaleFactorIncrement = 2;
+  let loungeTalkEventDelay = 1;
   let loungeResponseEventDelay = 1;
   let loungeTickDecrementValue = 1;
 
   // kitchen
   let kitchenBaseCounterValue = 50.0;
-  let kitchenAttentionTickIntervals = [3, 5, 10];
+  let kitchenAttentionTickIntervals = [5, 10, 12, 13, 15, 15, 15, 17, 18, 25];
   let kitchenPotStirredReward = 10;
-  let kitchenPotReadyIncrement = 0.1;
+  let kitchenPotReadyIncrement = 0.025;
   let kitchenBaseDecrementCounter = 0;
-  let kitchenPotStirredEventDelay = 0;
-  let kitchenPotReadyEventDelay = 0;
-  let kitchenPotStirredTickDecrementValue = 1;
+  let kitchenPotStirredEventDelay = 1;
+  let kitchenPotReadyEventDelay = 1;
+  let kitchenPotStirredTickDecrementValue = 0;
 
   // dining
   let diningBaseCounterValue = 50.0;
   let diningInitialLiftCounter = 0;
-  let diningLiftCounterThreshold = 30;
-  let diningFlippedIntervalTickDelays = [3, 7, 10];
-  let diningFlipChairEventDelay = 0;
-  let diningCheckLiftEventDelay = 0;
-  let diningLiftBaseTickReward = 6;
+  let diningLiftCounterThreshold = 20;
+  let diningFlippedIntervalTickDelays = [10, 10, 10];
+  let diningFlipChairEventDelay = 1;
+  let diningCheckLiftEventDelay = 1;
+  let diningLiftBaseTickReward = 25;
   let diningBaseCounterTickDecrement = 1;
   let diningKnockedCounterTickDecrement = 2;
 
   // kid
   let kidBaseCounterTicks = 50.0;
-  let kidRewardTicksForCorrect = 2;
-  let kidRewardTicksForInCorrect = 0;
-  let kidDrawPickedEventDelay = 0;
-  let kidHidePickedEventDelay = 2;
-  let kidHideOutputsEventDelay = 2;
+  let kidRewardTicksForCorrect = 5;
+  let kidRewardTicksForInCorrect = 1;
+  let kidDrawPickedEventDelay = 1;
+  let kidHidePickedEventDelay = 1;
+  let kidHideOutputsEventDelay = 1;
   let kidNeedsEventDelay = 0;
-  let kidFlashInfoEventDelay = 1;
-  let kidNeedsEventIntervals = [2, 2, 2];
+  let kidFlashInfoEventDelay = 2;
+  let kidNeedsEventIntervals = [2, 3, 4];
   let kidBaseDecrementTick = 1;
 
   // game vars
