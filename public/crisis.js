@@ -1,5 +1,48 @@
 
 (function() {
+
+  // lounge
+  let loungeBaseCounterValue = 50.0;
+  let loungeRewardValues = [1, 2, 3];
+  let loungeBaseScaleFactor = 1;
+  let loungeScaleFactorIncrement = 1;
+  let loungeTalkEventDelay = 2;
+  let loungeResponseEventDelay = 1;
+  let loungeTickDecrementValue = 1;
+
+  // kitchen
+  let kitchenBaseCounterValue = 50.0;
+  let kitchenAttentionTickIntervals = [3, 5, 10];
+  let kitchenPotStirredReward = 10;
+  let kitchenPotReadyIncrement = 0.1;
+  let kitchenBaseDecrementCounter = 0;
+  let kitchenPotStirredEventDelay = 0;
+  let kitchenPotReadyEventDelay = 0;
+  let kitchenPotStirredTickDecrementValue = 1;
+
+  // dining
+  let diningBaseCounterValue = 50.0;
+  let diningInitialLiftCounter = 0;
+  let diningLiftCounterThreshold = 30;
+  let diningFlippedIntervalTickDelays = [3, 7, 10];
+  let diningFlipChairEventDelay = 0;
+  let diningCheckLiftEventDelay = 0;
+  let diningLiftBaseTickReward = 6;
+  let diningBaseCounterTickDecrement = 1;
+  let diningKnockedCounterTickDecrement = 2;
+
+  // kid
+  let kidBaseCounterTicks = 50.0;
+  let kidRewardTicksForCorrect = 2;
+  let kidRewardTicksForInCorrect = 0;
+  let kidDrawPickedEventDelay = 0;
+  let kidHidePickedEventDelay = 2;
+  let kidHideOutputsEventDelay = 2;
+  let kidNeedsEventDelay = 0;
+  let kidFlashInfoEventDelay = 1;
+  let kidNeedsEventIntervals = [2, 2, 2];
+  let kidBaseDecrementTick = 1;
+
   // game vars
   let gameTime = 0;
   let tickMillis = 250;
@@ -8,12 +51,13 @@
   // game view
   let gameContainer;
   let scene;
+  let timerContainer;
   let arrowLeft;
   let arrowRight;
 
   let events = [];
 
-
+  let transitionTicks = 0.25;
   let transitionRoom = {
     id: 'transition',
     name: 'transition',
@@ -22,7 +66,7 @@
     outputs: [],
     events: {
       "transition" : {
-        ticks: 0.25 * timeScale,
+        ticks: transitionTicks * timeScale,
         targetRoom: null,
         action: function() {
           triggerDeactivation();
@@ -38,16 +82,13 @@
     },
   };
 
-  // let activeRoomIndex = Math.floor(Math.random() * 3);
-  let activeRoomIndex = 0;
-  let activeRoom;
   let rooms = [
     {
       id: 'lounge',
       name: 'Lounge',
-      counter: 50.0 * timeScale,
-      scalefactor: 1,
-      rewardValues: [1, 2, 3],
+      counter: loungeBaseCounterValue * timeScale,
+      scalefactor: loungeBaseScaleFactor,
+      rewardValues: loungeRewardValues,
       active: false,
       inputs: [
         {
@@ -70,26 +111,36 @@
           position: [0, 58]
         },
       ],
+      events: {
+        "talk-event": {
+          ticks: loungeTalkEventDelay * timeScale,
+          action: function () {
+            console.log("talk event!")
+            this.room.outputs[0].display.show();
+            modifyRoomScore(this.room, this.room.calculateScore());
+            this.room.roomUpkeep();
+
+            let responseEvent = $.extend({}, this.room.events["response-event"]);
+            responseEvent.room = this.room;
+            events.push(responseEvent);
+          }
+        },
+        "response-event": {
+          ticks: loungeResponseEventDelay * timeScale,
+          action: function() {
+            console.log("response event!");
+            this.room.outputs[0].display.hide();
+            showInputs(this.room);
+          }
+        }
+      },
       inputCall: function(room, input) {
         // console.log(input);
         // console.log(room.name, room.counter + " : " + room.active);
         hideInputs(room);
-        events.push({
-          ticks: 2 * timeScale,
-          action: function() {
-            room.outputs[0].display.show();
-            modifyRoomScore(room, room.calculateScore());
-            room.roomUpkeep();
-            events.push({
-              ticks: 1 * timeScale,
-              action: function() {
-                room.outputs[0].display.hide();
-                console.log('steup from event');
-                showInputs(room);
-              }
-            })
-          }
-        });
+        let talkEvent = $.extend({}, this.events["talk-event"]);
+        talkEvent.room = this;
+        events.push(talkEvent);
       },
       calculateScore: function () {
         let rewardIndex = Math.floor(Math.random() * (this.rewardValues.length));
@@ -100,13 +151,13 @@
         return this.rewardValues[rewardIndex] * this.scalefactor;
       },
       roomUpkeep: function() {
-        this.scalefactor += 1;
+        this.scalefactor += loungeScaleFactorIncrement;
       },
       activateRoom: function() {
         // showInputs(this);
       },
       deactivateRoom: function() {
-        this.scalefactor = 1;
+        this.scalefactor = loungeBaseScaleFactor;
       },
       setup: function() {
         setupOutputs(this);
@@ -114,19 +165,19 @@
       },
       update: function (delta, active) {
         // console.log(room.name, room.counter + " : " + room.active);
-        this.counter = this.counter - 1;
+        this.counter = this.counter - loungeTickDecrementValue;
       }
     },
     {
       id: 'kitchen',
       name: 'Kitchen',
-      counter: 50.0 * timeScale,
+      counter: kitchenBaseCounterValue * timeScale,
       active: false,
-      intervals: [3, 5, 10],
-      potReadyCount: 0,
+      intervals: kitchenAttentionTickIntervals,
+      potReadyCount: kitchenBaseDecrementCounter,
       potReady: true,
-      potStirredReward: 10,
-      potReadyIncrement: 1,
+      potStirredReward: kitchenPotStirredReward,
+      potReadyIncrement: kitchenPotReadyIncrement,
       inputs: [
         {
           id: "4",
@@ -144,7 +195,7 @@
       ],
       events: {
         'pot-stirred' : {
-          ticks: 0,
+          ticks: kitchenPotStirredEventDelay,
           action: function() {
             this.room.outputs[0].display.show();
 
@@ -159,7 +210,7 @@
           }
         },
         'pot-ready' : {
-          ticks: 0,
+          ticks: kitchenPotReadyEventDelay,
           action: function() {
             this.room.outputs[0].display.hide();
             this.room.potReady = true;
@@ -190,7 +241,7 @@
         // console.log(this);
         if (this.potReady) {
           // console.log(this.counter);
-          this.potReadyCount += this.potReadyIncrement / timeScale;
+          this.potReadyCount += this.potReadyIncrement;
           this.counter = this.counter - this.potReadyCount;
           // console.log("pot counter: ", this.potReadyCount);
           // console.log("advanced decrement: ", this.counter + " : " + this.active);
@@ -198,7 +249,7 @@
         } else {
           // console.log(this.counter);
           this.potReadyCount = 0;
-          this.counter = this.counter - 1;
+          this.counter = this.counter - kitchenPotStirredTickDecrementValue;
           // console.log("regular decrement: ", this.counter + " : " + this.active);
           // console.log(this.counter);
         }
@@ -207,11 +258,12 @@
     {
       id: 'dining',
       name: 'Dining',
-      counter: 50.0 * timeScale,
-      liftCounter: 0,
-      liftThreshold: 30,
-      liftWaitMin: 2,
-      liftWaitMax: 3,
+      counter: diningBaseCounterValue * timeScale,
+      liftCounter: diningInitialLiftCounter,
+      liftThreshold: diningLiftCounterThreshold,
+      knockedOverTickIntervals: diningFlippedIntervalTickDelays,
+      baseDecrement: diningBaseCounterTickDecrement,
+      knockedDecrement: diningKnockedCounterTickDecrement,
       active: false,
       inputs: [
         {
@@ -224,21 +276,22 @@
       outputs: [],
       events: {
         'knockdown-chair' : {
-          ticks: 0,
+          ticks: diningFlipChairEventDelay,
           action: function() {
             console.log('knock-down');
             showInputs(this.room);
+            this.room.knockedOver = true;
             this.room.scheduleLift();
           }
         },
         'check-lift' : {
-          ticks: 0,
+          ticks: diningCheckLiftEventDelay,
           action: function() {
             // console.log('check-lift');
             if(this.room.liftThreshold < this.room.liftCounter) {
               // console.log('release');
-              this.room.liftCounter = 0;
-              modifyRoomScore(this.room, 6 * timeScale);
+              this.room.liftCounter = diningInitialLiftCounter;
+              modifyRoomScore(this.room, diningLiftBaseTickReward * timeScale);
               hideInputs(this.room);
               this.room.scheduleKnockdown();
             } else {
@@ -251,7 +304,7 @@
       scheduleKnockdown: function() {
         let knockEvent = $.extend({}, this.events["knockdown-chair"]);
         knockEvent.room = this;
-        knockEvent.ticks = (Math.floor(Math.random()*this.liftWaitMax) + this.liftWaitMin) * timeScale;
+        knockEvent.ticks = this.knockedOverTickIntervals[Math.floor(Math.random()*this.knockedOverTickIntervals.length)] * timeScale;
         events.push(knockEvent);
       },
       scheduleLift: function() {
@@ -276,37 +329,282 @@
       },
       update: function (delta, active) {
         console.log(this.name, this.counter + " : " + this.active);
-        this.counter = this.counter - 1;
-
-        // determine state transition
         if (this.knockedOver) {
-
+          this.counter = this.counter - this.knockedDecrement;
+        } else {
+          this.counter = this.counter - this.baseDecrement;
         }
-        // put the event on if state broken
-
       }
     },
-    // {
-    //   id: 'kids',
-    //   name: 'Kids Room',
-    //   counter: 50.0 * timeScale,
-    //   active: false,
-    //   inputs: [
-    //     {
-    //       id: "2",
-    //       icon: "heart",
-    //       position: [0, 0]
-    //     }
-    //   ],
-    //   update: function (delta, active) {
-    //     // console.log(room.name, room.counter + " : " + room.active);
-    //     this.counter = this.counter - 1;
-    //   }
-    // }
+    {
+      id: 'kids',
+      name: 'Kids Room',
+      counter: kidBaseCounterTicks * timeScale,
+      active: false,
+      toys: ['a', 'b', 'c', 'd', 'e'],
+      draws: ['a', 'b', 'c', 'd', 'e', 'x', 'x', 'x', 'x', 'x'],
+      correctMatchReward: kidRewardTicksForCorrect * timeScale,
+      incorrectMatchReward: kidRewardTicksForInCorrect * timeScale,
+      childNeedsEventIntervals: kidNeedsEventIntervals,
+      inputs: [
+        {
+          id: "draw-0",
+          value: 0,
+          icon: "x",
+          position: [0*0, 0]
+        },
+        {
+          id: "draw-1",
+          value: 1,
+          icon: "x",
+          position: [1*65, 0]
+        },
+        {
+          id: "draw-2",
+          value: 2,
+          icon: "x",
+          position: [2*65, 0]
+        },
+        {
+          id: "draw-3",
+          value: 3,
+          icon: "x",
+          position: [3*65, 0]
+        },
+        {
+          id: "draw-4",
+          value: 4,
+          icon: "x",
+          position: [4*65, 0]
+        },
+        {
+          id: "draw-5",
+          value: 5,
+          icon: "x",
+          position: [5*65, 0]
+        },
+        {
+          id: "draw-6",
+          value: 6,
+          icon: "x",
+          position: [6*65, 0]
+        },
+        {
+          id: "draw-7",
+          value: 7,
+          icon: "x",
+          position: [7*65, 0]
+        },
+        {
+          id: "draw-8",
+          value: 8,
+          icon: "x",
+          position: [8*65, 0]
+        },
+        {
+          id: "draw-9",
+          value: 9,
+          icon: "x",
+          position: [9*65, 0]
+        }
+      ],
+      outputs: [
+        {
+          id: "draw-output",
+          icon: "x",
+          position: [0, 58]
+        },
+        {
+          id: "draw-output",
+          icon: "x",
+          position: [0, 58*2]
+        }
+      ],
+      events: {
+        "draw-picked": {
+          ticks: kidDrawPickedEventDelay * timeScale,
+          action: function() {
+            console.log('draw picked!');
+            $.each(this.room.inputs, function(index, input) {
+              input.display.hide();
+            });
+            this.room.outputs[0].icon = this.room.draws[this.input.value];
+            this.room.outputs[0].display
+                .attr('src', `assets/${this.room.id}-icon-${this.room.draws[this.input.value]}.png`);
+            this.room.outputs[0].display.show();
+
+            if (this.room.outputs[0].icon === this.room.outputs[1].icon) {
+              console.log('correct!');
+              modifyRoomScore(this.room, this.room.correctMatchReward);
+              hideInputs(this.room);
+              this.room.scheduleHideOutputs();
+            } else {
+              console.log('incorrect!');
+              modifyRoomScore(this.room, this.room.incorrectMatchReward);
+              this.room.scheduleHidePicked();
+            }
+          }
+        },
+        "hide-picked": {
+          ticks: kidHidePickedEventDelay * timeScale,
+          action: function() {
+            console.log('hide picked!');
+            this.room.outputs[0].display.hide();
+            $.each(this.room.inputs, function(index, input) {
+              input.display.show();
+            });
+          }
+        },
+        "hide-outputs": {
+          ticks: kidHideOutputsEventDelay * timeScale,
+          action: function() {
+            console.log('hide picked!');
+            $.each(this.room.outputs, function(index, output) {
+              output.display.hide();
+            });
+            this.room.scheduleChildNeedsEvent();
+          }
+        },
+        "child-needs": {
+          ticks: kidNeedsEventDelay,
+          action: function() {
+            console.log('child needs!');
+            let toyIndex = Math.floor(Math.random() * this.room.toys.length);
+            this.room.outputs[1].icon = this.room.toys[toyIndex];
+            this.room.outputs[1].display
+                .attr('src', `assets/${this.room.id}-icon-${this.room.toys[toyIndex]}.png`);
+            this.room.outputs[1].display.show();
+            $.each(this.room.inputs, function(index, input) {
+              input.display.show();
+            });
+          },
+        },
+        "flash-info": {
+          ticks: kidFlashInfoEventDelay * timeScale,
+          action: function() {
+            console.log('flash info!');
+            if (this.startIndex !== 0) {
+              console.log('clear last:', this.startIndex);
+              for(let i = 0; i < this.room.inputs.length; i++) {
+                let content = 'x';
+                this.room.inputs[i].display.hide();
+                this.room.inputs[i].display
+                    .attr('src', `assets/${this.room.id}-icon-${content}.png`);
+              }
+              this.room.scheduleChildNeedsEvent();
+              this.room.flashed=true;
+            } else {
+              console.log('show next:', this.startIndex);
+              for(let i=0; i < this.room.inputs.length; i++) {
+                let content = this.room.draws[this.room.inputs[i].value];
+                this.room.inputs[i].display
+                    .attr('src', `assets/${this.room.id}-icon-${content}.png`);
+                this.room.inputs[i].display.show();
+              }
+              this.room.scheduleFlash(-1);
+            }
+          },
+        },
+        "flash-info-split": {
+          ticks: 1 * timeScale,
+          action: function() {
+            console.log('flash info!');
+            if (this.startIndex !== 0) {
+              console.log('clear last:', this.startIndex);
+              for(let i = this.startIndex === -1 ? 5 : 0;
+                  i < (this.startIndex === -1 ? 5 : 0) + 5;
+                  i++) {
+                let content = 'x';
+                this.room.inputs[i].display.hide();
+                this.room.inputs[i].display
+                    .attr('src', `assets/${this.room.id}-icon-${content}.png`);
+              }
+            }
+
+            if (this.startIndex !== -1) {
+              console.log('show next:', this.startIndex);
+              for(let i=this.startIndex; i < this.startIndex+5; i++) {
+                let content = this.room.draws[this.room.inputs[i].value];
+                this.room.inputs[i].display
+                    .attr('src', `assets/${this.room.id}-icon-${content}.png`);
+                this.room.inputs[i].display.show();
+              }
+            }
+
+            if (this.startIndex === 0) {
+              this.room.scheduleFlash(5);
+            } else if (this.startIndex === 5) {
+              this.room.scheduleFlash(-1);
+            } else {
+              this.room.scheduleChildNeedsEvent();
+            }
+          },
+        }
+      },
+      scheduleHidePicked: function() {
+        let hidePickedEvent = $.extend({}, this.events["hide-picked"]);
+        hidePickedEvent.room = this;
+        events.push(hidePickedEvent);
+      },
+      scheduleHideOutputs: function() {
+        let hidePickedEvent = $.extend({}, this.events["hide-outputs"]);
+        hidePickedEvent.room = this;
+        events.push(hidePickedEvent);
+      },
+      inputCall: function(room, input) {
+        let drawPickedEvent = $.extend({}, this.events["draw-picked"]);
+        drawPickedEvent.room = this;
+        drawPickedEvent.input = input;
+        events.push(drawPickedEvent);
+      },
+      scheduleChildNeedsEvent: function () {
+        let childNeedsEvent = $.extend({}, this.events["child-needs"]);
+        childNeedsEvent.ticks = this.childNeedsEventIntervals[Math.floor(Math.random()*this.childNeedsEventIntervals.length)] * timeScale;
+        childNeedsEvent.room = this;
+        events.push(childNeedsEvent);
+      },
+      scheduleFlash: function(startIndex) {
+        let flashInfoEvent = $.extend({}, this.events["flash-info"]);
+        flashInfoEvent.room = this;
+        flashInfoEvent.startIndex = startIndex;
+        events.push(flashInfoEvent);
+      },
+      shuffleDraws: function() {
+        let j, x, i;
+        for (i = this.draws.length - 1; i > 0; i--) {
+          j = Math.floor(Math.random() * (i + 1));
+          x = this.draws[i];
+          this.draws[i] = this.draws[j];
+          this.draws[j] = x;
+        }
+      },
+      setup: function() {
+        setupOutputs(this);
+        setupInputs(this);
+        hideInputs(this);
+        this.shuffleDraws();
+      },
+      activateRoom: function() {
+        if (!this.flashed) {
+          this.scheduleFlash(0);
+        }
+      },
+      deactivateRoom: function() {
+
+      },
+      update: function (delta, active) {
+        console.log(this.name, this.counter + " : " + this.active);
+        this.counter = this.counter - kidBaseDecrementTick;
+      }
+    }
   ];
+
+  let activeRoom;
+  let activeRoomIndex = Math.floor(Math.random() * rooms.length);
 
   function setup() {
     gameContainer = $('#game-container');
+    timerContainer = $('#timers-container');
     scene = $('#scene');
 
     setupRooms();
@@ -331,6 +629,16 @@
       if (room.setup) {
         room.setup();
       }
+
+      room.counterDisplay = $(`
+        <div id="${room.id}-timer">
+          <h4>${room.name}</h4>
+          <h3><b id="${room.id}-timer-value">${room.counter}</b></h3>
+        </div>
+      `);
+      room.counterValueDisplay = room.counterDisplay.find(`#${room.id}-timer-value`);
+      timerContainer.append(room.counterDisplay);
+
       scene.append(room.display);
       if (activeRoomIndex === roomIndex) {
         triggerActivation(room);
@@ -403,6 +711,20 @@
     }
   }
 
+  function showOutputs(room) {
+    this.console.log("show outputs:", room.id);
+    for (let i = 0; i < room.outputs.length; i++) {
+      room.outputs[i].display.show();
+    }
+  }
+
+  function hideOutputs(room) {
+    this.console.log("hide outputs:", room.id);
+    for (let i = 0; i < room.outputs.length; i++) {
+      room.outputs[i].display.hide();
+    }
+  }
+
   function modifyRoomScore(room ,score) {
     room.counter += score;
   }
@@ -458,10 +780,13 @@
   }
 
   let accumulator = 0;
-
   function loop() {
     let stepTime = (new Date()).getTime();
     let delta = stepTime - gameTime;
+
+    $.each(rooms, function(index, room) {
+      updateTimers(room);
+    });
 
     if (accumulator > tickMillis) {
       processEvents();
@@ -477,6 +802,10 @@
     gameTime = stepTime;
 
     window.requestAnimationFrame(loop);
+  }
+
+  function updateTimers(room) {
+    room.counterValueDisplay.html(room.counter);
   }
 
   function processEvents() {

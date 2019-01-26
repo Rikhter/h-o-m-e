@@ -15,8 +15,8 @@ body {
   justify-content: center;
 }
 
-#game-container {
-
+#timers-container {
+  justify-content: space-around;
 }
 
 .scene {
