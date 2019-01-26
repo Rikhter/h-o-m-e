@@ -44,7 +44,7 @@
   let kidBaseDecrementTick = 1;
 
   // game vars
-  let gameTime = 0;
+  let gameTime = (new Date()).getTime();
   let tickMillis = 250;
   let timeScale = 1000 / tickMillis;
 
@@ -52,6 +52,7 @@
   let gameContainer;
   let scene;
   let timerContainer;
+  let scoreTimer;
   let arrowLeft;
   let arrowRight;
 
@@ -287,15 +288,15 @@
         'check-lift' : {
           ticks: diningCheckLiftEventDelay,
           action: function() {
-            // console.log('check-lift');
+            console.log('check-lift');
             if(this.room.liftThreshold < this.room.liftCounter) {
-              // console.log('release');
+              console.log('release');
               this.room.liftCounter = diningInitialLiftCounter;
               modifyRoomScore(this.room, diningLiftBaseTickReward * timeScale);
               hideInputs(this.room);
               this.room.scheduleKnockdown();
             } else {
-              // console.log('persist');
+              console.log('persist');
               this.room.scheduleLift();
             }
           }
@@ -605,6 +606,7 @@
   function setup() {
     gameContainer = $('#game-container');
     timerContainer = $('#timers-container');
+    scoreTimer = $('#score-timer');
     scene = $('#scene');
 
     setupRooms();
@@ -780,6 +782,7 @@
   }
 
   let accumulator = 0;
+
   function loop() {
     let stepTime = (new Date()).getTime();
     let delta = stepTime - gameTime;
@@ -796,12 +799,23 @@
       checkGameState();
       accumulator = 0;
     } else {
-      accumulator += delta;
+      accumulator = accumulator + delta;
     }
 
+    if (!gameOver) {
+      updateScoreTimer(delta);
+    }
     gameTime = stepTime;
 
     window.requestAnimationFrame(loop);
+  }
+
+  let timeTally = 0;
+  function updateScoreTimer(delta) {
+    console.log(delta);
+    console.log(timeTally);
+    timeTally = timeTally + delta;
+    scoreTimer.html(`${(timeTally/1000/60).toFixed(0)}m ${((timeTally/1000)%60).toFixed(0)}.${((timeTally)%1000).toFixed(0)}s `);
   }
 
   function updateTimers(room) {
@@ -820,11 +834,13 @@
     }
   }
 
+  let gameOver = false;
   function checkGameState() {
     for (let roomIndex = 0; roomIndex < rooms.length; roomIndex++) {
       let room = rooms[roomIndex];
       if (room.counter <= 0) {
         scene.html("<h1>Game Over</h1>");
+        gameOver = true;
       }
     }
   }
