@@ -198,9 +198,9 @@
       inputs: [
         {
           id: "4",
-          icon: "heart",
-          classes: "right",
-          position: [0, 0]
+          icon: "pot",
+          classes: "",
+          position: [360, 250]
         }
       ],
       outputs: [
@@ -360,8 +360,10 @@
       loseMessage: "Where's my toy!?",
       counter: kidBaseCounterTicks * timeScale,
       active: false,
-      toys: ['a', 'b', 'c', 'd', 'e'],
-      draws: ['a', 'b', 'c', 'd', 'e', 'x', 'x', 'x', 'x', 'x'],
+      characters: true,
+      speech: true,
+      toys: ['blocks', 'car', 'cat', 'dummy'],
+      draws: ['blocks', 'car', 'cat', 'dummy', 'sock', 'sock', 'sock', 'sock', 'sock', 'sock'],
       correctMatchReward: kidRewardTicksForCorrect * timeScale,
       incorrectMatchReward: kidRewardTicksForInCorrect * timeScale,
       childNeedsEventIntervals: kidNeedsEventIntervals,
@@ -369,74 +371,74 @@
         {
           id: "draw-0",
           value: 0,
-          icon: "x",
-          position: [0*0, 0]
+          icon: "sock",
+          position: [420, 232]
         },
         {
           id: "draw-1",
           value: 1,
-          icon: "x",
-          position: [1*65, 0]
+          icon: "sock",
+          position: [420, 264]
         },
         {
           id: "draw-2",
           value: 2,
-          icon: "x",
-          position: [2*65, 0]
+          icon: "sock",
+          position: [418, 300]
         },
         {
           id: "draw-3",
           value: 3,
-          icon: "x",
-          position: [3*65, 0]
+          icon: "sock",
+          position: [416, 332]
         },
         {
           id: "draw-4",
           value: 4,
-          icon: "x",
-          position: [4*65, 0]
+          icon: "sock",
+          position: [416, 364]
         },
         {
           id: "draw-5",
           value: 5,
-          icon: "x",
-          position: [5*65, 0]
+          icon: "sock",
+          position: [482, 270]
         },
         {
           id: "draw-6",
           value: 6,
-          icon: "x",
-          position: [6*65, 0]
+          icon: "sock",
+          position: [476, 300]
         },
         {
           id: "draw-7",
           value: 7,
-          icon: "x",
-          position: [7*65, 0]
+          icon: "sock",
+          position: [476, 332]
         },
         {
           id: "draw-8",
           value: 8,
-          icon: "x",
-          position: [8*65, 0]
+          icon: "sock",
+          position: [476, 364]
         },
         {
           id: "draw-9",
           value: 9,
-          icon: "x",
-          position: [9*65, 0]
+          icon: "sock",
+          position: [476, 400]
         }
       ],
       outputs: [
         {
           id: "draw-output",
-          icon: "x",
-          position: [0, 58]
+          icon: "sock",
+          position: [301, 379]
         },
         {
-          id: "draw-output",
-          icon: "x",
-          position: [0, 58*2]
+          id: "child-output",
+          icon: "sock",
+          position: [419, 448]
         }
       ],
       events: {
@@ -505,7 +507,7 @@
             if (this.startIndex !== 0) {
               console.log('clear last:', this.startIndex);
               for(let i = 0; i < this.room.inputs.length; i++) {
-                let content = 'x';
+                let content = 'handle';
                 this.room.inputs[i].display.hide();
                 this.room.inputs[i].display
                     .attr('src', `assets/${this.room.id}-icon-${content}.png`);
@@ -533,7 +535,7 @@
               for(let i = this.startIndex === -1 ? 5 : 0;
                   i < (this.startIndex === -1 ? 5 : 0) + 5;
                   i++) {
-                let content = 'x';
+                let content = 'handle';
                 this.room.inputs[i].display.hide();
                 this.room.inputs[i].display
                     .attr('src', `assets/${this.room.id}-icon-${content}.png`);
@@ -619,7 +621,7 @@
   ];
 
   let activeRoom;
-  // let activeRoomIndex = 0;
+  // let activeRoomIndex = 3;
   let activeRoomIndex = Math.floor(Math.random() * rooms.length);
 
   function setup() {
