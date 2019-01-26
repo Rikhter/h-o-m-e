@@ -825,7 +825,7 @@
   }
 
   function updateTimers(room) {
-    room.counterValueDisplay.html(room.counter);
+    room.counterValueDisplay.html(Math.floor(room.counter).toFixed(0));
   }
 
   function processEvents() {
