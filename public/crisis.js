@@ -70,7 +70,7 @@
     display: $(`
         <div>
           <div class="row">
-            <h3 id="room-title">Transition</h3>
+            <h3 id="room-title">Moving...</h3>
           </div>
           <div id="transition-container" class="row">
             <img id="transition-backdrop" src="assets/run-left.png"/>
@@ -133,6 +133,7 @@
   };
 
 
+  let heightAdjust = 30;
   let rooms = [
     {
       id: 'lounge',
@@ -149,32 +150,32 @@
           id: "talk1",
           icon: "heart",
           classes: "",
-          position: [322, 171]
+          position: [322, 171-heightAdjust]
         },
         {
           id: "talk2",
           icon: "pot",
           classes: "",
-          position: [415, 171]
+          position: [415, 171-heightAdjust]
         },
         {
           id: "talk3",
           icon: "dining",
           classes: "",
-          position: [322, 239]
+          position: [322, 239-heightAdjust]
         },
         {
           id: "talk4",
           icon: "kids",
           classes: "",
-          position: [415, 239]
+          position: [415, 239-heightAdjust]
         },
       ],
       outputs: [
         {
           id: "talk-back",
           icon: "heart",
-          position: [204, 254]
+          position: [204, 254-heightAdjust]
         },
       ],
       events: {
@@ -253,13 +254,13 @@
           id: "pot-boiling",
           icon: "boiling",
           classes: "",
-          position: [360, 250]
+          position: [360, 250-heightAdjust]
         },
         {
           id: "pot-fire",
           icon: "fire",
           classes: "",
-          position: [360, 208]
+          position: [360, 208-heightAdjust]
         }
       ],
       outputs: [
@@ -267,7 +268,7 @@
           id: "pot-okay",
           icon: "pot",
           classes: "",
-          position: [360, 250]
+          position: [360, 250-heightAdjust]
         },
       ],
       events: {
@@ -358,7 +359,7 @@
           id: "lift-chair",
           icon: "arrow",
           class: "",
-          position: [615, 540]
+          position: [615, 540-heightAdjust]
         }
       ],
       outputs: [
@@ -366,7 +367,7 @@
           id: "chair",
           icon: "chair",
           class: "",
-          position: [440, 365]
+          position: [440, 365-heightAdjust]
         }
       ],
       events: {
@@ -458,73 +459,73 @@
           id: "draw-0",
           value: 0,
           icon: "sock",
-          position: [420, 232]
+          position: [420, 232-heightAdjust]
         },
         {
           id: "draw-1",
           value: 1,
           icon: "sock",
-          position: [420, 264]
+          position: [420, 264-heightAdjust]
         },
         {
           id: "draw-2",
           value: 2,
           icon: "sock",
-          position: [418, 300]
+          position: [418, 300-heightAdjust]
         },
         {
           id: "draw-3",
           value: 3,
           icon: "sock",
-          position: [416, 332]
+          position: [416, 332-heightAdjust]
         },
         {
           id: "draw-4",
           value: 4,
           icon: "sock",
-          position: [416, 364]
+          position: [416, 364-heightAdjust]
         },
         {
           id: "draw-5",
           value: 5,
           icon: "sock",
-          position: [482, 270]
+          position: [482, 270-heightAdjust]
         },
         {
           id: "draw-6",
           value: 6,
           icon: "sock",
-          position: [476, 300]
+          position: [476, 300-heightAdjust]
         },
         {
           id: "draw-7",
           value: 7,
           icon: "sock",
-          position: [476, 332]
+          position: [476, 332-heightAdjust]
         },
         {
           id: "draw-8",
           value: 8,
           icon: "sock",
-          position: [476, 364]
+          position: [476, 364-heightAdjust]
         },
         {
           id: "draw-9",
           value: 9,
           icon: "sock",
-          position: [476, 400]
+          position: [476, 400-heightAdjust]
         }
       ],
       outputs: [
         {
           id: "draw-output",
           icon: "sock",
-          position: [301, 379]
+          position: [301, 379-heightAdjust]
         },
         {
           id: "child-output",
           icon: "sock",
-          position: [419, 448]
+          position: [419, 448-heightAdjust]
         }
       ],
       events: {

@@ -73,6 +73,10 @@ h3 {}
   position: absolute;
 }
 
+h3 {
+  margin: 3px;
+}
+
 .knocked-chair {
   -webkit-transform: rotate(97deg);
   -moz-transform: rotate(97deg);
