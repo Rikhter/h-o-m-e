@@ -1,8 +1,10 @@
 
 (function() {
 
+  let baseTime = 50.0;
+
   // lounge
-  let loungeBaseCounterValue = 50.0;
+  let loungeBaseCounterValue = baseTime;
   let loungeRewardValues = [5, 6, 7, 8, 8, 8, 9, 10, 11];
   let loungeBaseScaleFactor = 3;
   let loungeScaleFactorIncrement = 2;
@@ -11,7 +13,7 @@
   let loungeTickDecrementValue = 1;
 
   // kitchen
-  let kitchenBaseCounterValue = 50.0;
+  let kitchenBaseCounterValue = baseTime;
   let kitchenAttentionTickIntervals = [5, 10, 12, 13, 15, 15, 15, 17, 18, 25];
   let kitchenPotStirredReward = 10;
   let kitchenPotReadyIncrement = 0.025;
@@ -20,8 +22,10 @@
   let kitchenPotReadyEventDelay = 1;
   let kitchenPotStirredTickDecrementValue = 0;
 
+  let potFireThreshold = 6;
+
   // dining
-  let diningBaseCounterValue = 50.0;
+  let diningBaseCounterValue = baseTime;
   let diningInitialLiftCounter = 0;
   let diningLiftCounterThreshold = 20;
   let diningFlippedIntervalTickDelays = [10, 10, 10];
@@ -32,9 +36,9 @@
   let diningKnockedCounterTickDecrement = 2;
 
   // kid
-  let kidBaseCounterTicks = 50.0;
+  let kidBaseCounterTicks = baseTime;
   let kidRewardTicksForCorrect = 5;
-  let kidRewardTicksForInCorrect = 1;
+  let kidRewardTicksForInCorrect = -2;
   let kidDrawPickedEventDelay = 0;
   let kidHidePickedEventDelay = 1;
   let kidHideOutputsEventDelay = 1;
@@ -51,7 +55,8 @@
   // game view
   let gameContainer;
   let scene;
-  let timerContainer;
+  let timerContainerLeft;
+  let timerContainerRight;
   let scoreTimer;
   let arrowLeft;
   let arrowRight;
@@ -62,7 +67,51 @@
   let transitionRoom = {
     id: 'transition',
     name: 'transition',
-    display: $('<h1>transition</h1>'),
+    display: $(`
+        <div>
+          <div class="row">
+            <h3 id="room-title">Transition</h3>
+          </div>
+          <div id="transition-container" class="row">
+            <img id="transition-backdrop" src="assets/run-left.png"/>
+          </div>
+        </div>
+      `),
+    inputs: [],
+    outputs: [],
+    events: {
+      "transition" : {
+        ticks: transitionTicks * timeScale,
+        targetRoom: null,
+        action: function() {
+          if (!gameOver) {
+            triggerDeactivation();
+            triggerActivation(this.targetRoom);
+          }
+        }
+      }
+    },
+    activateRoom: function() {
+      hideArrows();
+    },
+    deactivateRoom: function() {
+      showArrows();
+    },
+  };
+
+  let gameOverRoom = {
+    id: 'gameover',
+    name: 'Toilet',
+    display: $(`
+        <div>
+          <div class="row">
+            <h3 id="room-title">Game Over</h3>
+          </div>
+          <div id="gameover-container" class="row">
+            <img id="gameover-backdrop" src="assets/toilet-backdrop.png"/>
+          </div>
+        </div>
+      `),
     inputs: [],
     outputs: [],
     events: {
@@ -83,10 +132,11 @@
     },
   };
 
+
   let rooms = [
     {
       id: 'lounge',
-      name: 'Lounge',
+      name: 'Lounge Room',
       counter: loungeBaseCounterValue * timeScale,
       scalefactor: loungeBaseScaleFactor,
       rewardValues: loungeRewardValues,
@@ -188,6 +238,7 @@
       id: 'kitchen',
       name: 'Kitchen',
       loseMessage: "Your kitchen blew up!",
+      characters: true,
       counter: kitchenBaseCounterValue * timeScale,
       active: false,
       intervals: kitchenAttentionTickIntervals,
@@ -197,17 +248,24 @@
       potReadyIncrement: kitchenPotReadyIncrement,
       inputs: [
         {
-          id: "4",
-          icon: "pot",
+          id: "pot-boiling",
+          icon: "boiling",
           classes: "",
           position: [360, 250]
+        },
+        {
+          id: "pot-fire",
+          icon: "fire",
+          classes: "",
+          position: [360, 208]
         }
       ],
       outputs: [
         {
-          id: "pot-stirred",
-          icon: "heart",
-          position: [0, 58]
+          id: "pot-okay",
+          icon: "pot",
+          classes: "",
+          position: [360, 250]
         },
       ],
       events: {
@@ -215,7 +273,8 @@
           ticks: kitchenPotStirredEventDelay,
           action: function() {
             this.room.outputs[0].display.show();
-
+            hideInputs(this.room);
+            showOutputs(this.room);
             this.room.potReady = false;
             modifyRoomScore(this.room, this.room.potStirredReward * timeScale);
             let resultEvent = $.extend({}, this.room.events["pot-ready"]);
@@ -231,7 +290,8 @@
           action: function() {
             this.room.outputs[0].display.hide();
             this.room.potReady = true;
-            showInputs(this.room);
+            this.room.inputs[0].display.show();
+            // schedule
           }
         }
       },
@@ -253,6 +313,8 @@
       setup: function() {
         setupOutputs(this);
         setupInputs(this);
+        hideInputs(this);
+        this.inputs[0].display.show();
       },
       update: function (delta, active) {
         // console.log(this);
@@ -260,6 +322,11 @@
           // console.log(this.counter);
           this.potReadyCount += this.potReadyIncrement;
           this.counter = this.counter - this.potReadyCount;
+          if (this.potReadyCount > potFireThreshold) {
+            this.inputs[0].display.hide();
+            this.inputs[1].display.show();
+          }
+
           // console.log("pot counter: ", this.potReadyCount);
           // console.log("advanced decrement: ", this.counter + " : " + this.active);
           // console.log(this.counter);
@@ -274,8 +341,9 @@
     },
     {
       id: 'dining',
-      name: 'Dining',
+      name: 'Dining Room',
       loseMessage: "Your cat is evil!",
+      characters: true,
       counter: diningBaseCounterValue * timeScale,
       liftCounter: diningInitialLiftCounter,
       liftThreshold: diningLiftCounterThreshold,
@@ -286,20 +354,32 @@
       inputs: [
         {
           id: "lift-chair",
-          icon: "heart",
-          class: "top",
-          position: [0, 0]
+          icon: "arrow",
+          class: "",
+          position: [615, 540]
         }
       ],
-      outputs: [],
+      outputs: [
+        {
+          id: "chair",
+          icon: "chair",
+          class: "",
+          position: [440, 365]
+        }
+      ],
       events: {
         'knockdown-chair' : {
           ticks: diningFlipChairEventDelay,
           action: function() {
             console.log('knock-down');
-            showInputs(this.room);
-            this.room.knockedOver = true;
-            this.room.scheduleLift();
+            if (this.room.active) {
+              this.room.scheduleKnockdown();
+            } else {
+              showInputs(this.room);
+              this.room.outputs[0].display.addClass('knocked-chair');
+              this.room.knockedOver = true;
+              this.room.scheduleLift();
+            }
           }
         },
         'check-lift' : {
@@ -310,7 +390,9 @@
               console.log('release');
               this.room.liftCounter = diningInitialLiftCounter;
               modifyRoomScore(this.room, diningLiftBaseTickReward * timeScale);
+              this.room.outputs[0].display.removeClass('knocked-chair');
               hideInputs(this.room);
+              this.room.knockedOver = false;
               this.room.scheduleKnockdown();
             } else {
               console.log('persist');
@@ -338,6 +420,7 @@
         setupOutputs(this);
         setupInputs(this);
         hideInputs(this);
+        showOutputs(this);
         this.scheduleKnockdown();
       },
       activateRoom: function() {
@@ -357,7 +440,7 @@
     },
     {
       id: 'kids',
-      name: 'Kids Room',
+      name: 'Bedroom',
       loseMessage: "Where's my toy!?",
       counter: kidBaseCounterTicks * timeScale,
       active: false,
@@ -589,7 +672,9 @@
       },
       update: function (delta, active) {
         console.log(this.name, this.counter + " : " + this.active);
-        this.counter = this.counter - kidBaseDecrementTick;
+        if (!this.active) {
+          this.counter = this.counter - kidBaseDecrementTick;
+        }
       }
     }
   ];
@@ -600,7 +685,8 @@
 
   function setup() {
     gameContainer = $('#game-container');
-    timerContainer = $('#timers-container');
+    timerContainerLeft = $('#timers-container-left');
+    timerContainerRight = $('#timers-container-right');
     scoreTimer = $('#score-timer');
     scene = $('#scene');
 
@@ -609,6 +695,7 @@
   }
 
   function setupRooms() {
+    let alternateTimer = true;
     for(let roomIndex = 0; roomIndex < rooms.length; roomIndex++) {
       let room = rooms[roomIndex];
       room.display = $(`
@@ -635,18 +722,27 @@
 
       room.counterDisplay = $(`
         <div id="${room.id}-timer">
-          <h4>${room.name}</h4>
-          <h3><b id="${room.id}-timer-value">${room.counter}</b></h3>
+          <h4>${room.name}:  <b id="${room.id}-timer-value">${room.counter}</b></h4>
         </div>
       `);
       room.counterValueDisplay = room.counterDisplay.find(`#${room.id}-timer-value`);
-      timerContainer.append(room.counterDisplay);
+      if (alternateTimer) {
+        timerContainerLeft.append(room.counterDisplay);
+      } else {
+        timerContainerRight.append(room.counterDisplay);
+      }
+      alternateTimer = !alternateTimer;
 
       scene.append(room.display);
       if (activeRoomIndex === roomIndex) {
         triggerActivation(room);
       }
     }
+
+    gameOverRoom.display.hide();
+    scene.append(gameOverRoom.display);
+    transitionRoom.display.hide();
+    scene.append(transitionRoom.display);
   }
 
   function triggerDeactivation() {
@@ -733,11 +829,11 @@
   }
 
   function setupArrows() {
-    arrowLeft = $(`<div id="arrow-left"><img class="left" src="assets/lounge-icon-heart.png"></div>`);
+    arrowLeft = $(`<div id="arrow-left"><img class="right" src="assets/dining-icon-arrow.png"></div>`);
     arrowLeft.click(moveLeft);
     $('#button-container-left').append(arrowLeft);
 
-    arrowRight = $(`<div id="arrow-right"><img class="right" src="assets/lounge-icon-heart.png"></div>`);
+    arrowRight = $(`<div id="arrow-right"><img class="left" src="assets/dining-icon-arrow.png"></div>`);
     arrowRight.click(moveRight);
     $('#button-container-right').append(arrowRight);
   }
@@ -761,6 +857,7 @@
       activeRoomIndex = activeRoomIndex - 1;
     }
     transitionEvent.targetRoom = rooms[activeRoomIndex];
+    transitionRoom.display.find('#transition-backdrop').attr('src', 'assets/run-left.png');
     events.push(transitionEvent);
     triggerActivation(transitionRoom);
   }
@@ -774,6 +871,7 @@
       activeRoomIndex = activeRoomIndex + 1;
     }
     transitionEvent.targetRoom = rooms[activeRoomIndex];
+    transitionRoom.display.find('#transition-backdrop').attr('src', 'assets/run-right.png');
     events.push(transitionEvent);
     triggerActivation(transitionRoom);
   }
@@ -846,8 +944,11 @@
     for (let roomIndex = 0; roomIndex < rooms.length; roomIndex++) {
       let room = rooms[roomIndex];
       if (room.counter <= 0) {
-        scene.html(`<h1>Game Over</h1><br/><h3><i>${room.loseMessage}</i></h3>`);
-        timerContainer.hide();
+        triggerDeactivation(activeRoom);
+        triggerActivation(gameOverRoom);
+        timerContainerLeft.hide();
+        timerContainerRight.hide();
+        $('#score-area').append(`<div class="row"><h3>${room.loseMessage}</h3></div>`);
         deadRoom = room.name;
         gameOver = true;
       }

@@ -3,6 +3,8 @@ body {
   font-family: "Helvetica Neue";
 }
 
+h3 {}
+
 .column {
   display: flex;
   flex-direction: column;
@@ -15,7 +17,7 @@ body {
   justify-content: center;
 }
 
-#timers-container {
+#timers-container-left, #timers-container-right {
   justify-content: space-around;
 }
 
@@ -28,7 +30,6 @@ body {
 }
 
 .button {
-  margin: 40px;
   top: 200px;
 }
 
@@ -70,4 +71,17 @@ body {
 
 .speech {
   position: absolute;
+}
+
+.knocked-chair {
+  -webkit-transform: rotate(97deg);
+  -moz-transform: rotate(97deg);
+  -ms-transform: rotate(97deg);
+  -o-transform: rotate(97deg);
+  transform: rotate(97deg);
+  -webkit-transform-origin: bottom;
+  -moz-transform-origin: bottom;
+  -ms-transform-origin: bottom;
+  -o-transform-origin: bottom;
+  transform-origin: bottom;
 }
