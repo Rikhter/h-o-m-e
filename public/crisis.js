@@ -513,7 +513,7 @@
                 this.room.inputs[i].display
                     .attr('src', `assets/${this.room.id}-icon-${content}.png`);
               }
-              this.room.scheduleChildNeedsEvent();
+              this.room.scheduleChildNeedsEvent(0);
               this.room.flashed=true;
             } else {
               console.log('show next:', this.startIndex);
@@ -524,41 +524,6 @@
                 this.room.inputs[i].display.show();
               }
               this.room.scheduleFlash(-1);
-            }
-          },
-        },
-        "flash-info-split": {
-          ticks: 1 * timeScale,
-          action: function() {
-            console.log('flash info!');
-            if (this.startIndex !== 0) {
-              console.log('clear last:', this.startIndex);
-              for(let i = this.startIndex === -1 ? 5 : 0;
-                  i < (this.startIndex === -1 ? 5 : 0) + 5;
-                  i++) {
-                let content = 'handle';
-                this.room.inputs[i].display.hide();
-                this.room.inputs[i].display
-                    .attr('src', `assets/${this.room.id}-icon-${content}.png`);
-              }
-            }
-
-            if (this.startIndex !== -1) {
-              console.log('show next:', this.startIndex);
-              for(let i=this.startIndex; i < this.startIndex+5; i++) {
-                let content = this.room.draws[this.room.inputs[i].value];
-                this.room.inputs[i].display
-                    .attr('src', `assets/${this.room.id}-icon-${content}.png`);
-                this.room.inputs[i].display.show();
-              }
-            }
-
-            if (this.startIndex === 0) {
-              this.room.scheduleFlash(5);
-            } else if (this.startIndex === 5) {
-              this.room.scheduleFlash(-1);
-            } else {
-              this.room.scheduleChildNeedsEvent();
             }
           },
         }
@@ -579,16 +544,24 @@
         drawPickedEvent.input = input;
         events.push(drawPickedEvent);
       },
-      scheduleChildNeedsEvent: function () {
+      scheduleChildNeedsEvent: function (tickSchedule) {
         let childNeedsEvent = $.extend({}, this.events["child-needs"]);
-        childNeedsEvent.ticks = this.childNeedsEventIntervals[Math.floor(Math.random()*this.childNeedsEventIntervals.length)] * timeScale;
+        if (tickSchedule !== undefined) {
+          childNeedsEvent.ticks = 0;
+        } else {
+          childNeedsEvent.ticks =
+              this.childNeedsEventIntervals[Math.floor(Math.random()*this.childNeedsEventIntervals.length)] * timeScale;
+        }
         childNeedsEvent.room = this;
         events.push(childNeedsEvent);
       },
-      scheduleFlash: function(startIndex) {
+      scheduleFlash: function(startIndex, ticks) {
         let flashInfoEvent = $.extend({}, this.events["flash-info"]);
         flashInfoEvent.room = this;
         flashInfoEvent.startIndex = startIndex;
+        if (ticks !== undefined) {
+          flashInfoEvent.ticks = ticks;
+        }
         events.push(flashInfoEvent);
       },
       shuffleDraws: function() {
@@ -608,7 +581,7 @@
       },
       activateRoom: function() {
         if (!this.flashed) {
-          this.scheduleFlash(0);
+          this.scheduleFlash(0,0);
         }
       },
       deactivateRoom: function() {
