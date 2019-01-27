@@ -10,11 +10,11 @@
   let loungeScaleFactorIncrement = 2;
   let loungeTalkEventDelay = 1;
   let loungeResponseEventDelay = 1;
-  let loungeTickDecrementValue = 1;
+  let loungeTickDecrementValue = 2;
 
   // kitchen
   let kitchenBaseCounterValue = baseTime;
-  let kitchenAttentionTickIntervals = [5, 10, 12, 13, 15, 15, 15, 17, 18, 25];
+  let kitchenAttentionTickIntervals = [11, 12, 15, 15, 15, 17, 20, 25];
   let kitchenPotStirredReward = 10;
   let kitchenPotReadyIncrement = 0.025;
   let kitchenBaseDecrementCounter = 0;
@@ -22,23 +22,23 @@
   let kitchenPotReadyEventDelay = 1;
   let kitchenPotStirredTickDecrementValue = 0;
 
-  let potFireThreshold = 6;
+  let potFireThreshold = 3;
 
   // dining
   let diningBaseCounterValue = baseTime;
   let diningInitialLiftCounter = 0;
-  let diningLiftCounterThreshold = 20;
-  let diningFlippedIntervalTickDelays = [10, 10, 10];
+  let diningLiftCounterThreshold = 23;
+  let diningFlippedIntervalTickDelays = [10, 15, 15, 20, 20, 20, 25, 25, 30];
   let diningFlipChairEventDelay = 1;
   let diningCheckLiftEventDelay = 1;
-  let diningLiftBaseTickReward = 25;
+  let diningLiftBaseTickReward = 18;
   let diningBaseCounterTickDecrement = 0;
   let diningKnockedCounterTickDecrement = 2;
 
   // kid
   let kidBaseCounterTicks = baseTime;
-  let kidRewardTicksForCorrect = 5;
-  let kidRewardTicksForInCorrect = -2;
+  let kidRewardTicksForCorrect = 6;
+  let kidRewardTicksForInCorrect = 1;
   let kidDrawPickedEventDelay = 0;
   let kidHidePickedEventDelay = 1;
   let kidHideOutputsEventDelay = 1;
@@ -231,7 +231,9 @@
       },
       update: function (delta, active) {
         // console.log(room.name, room.counter + " : " + room.active);
-        this.counter = this.counter - loungeTickDecrementValue;
+        if (!this.active) {
+          this.counter = this.counter - loungeTickDecrementValue;
+        }
       }
     },
     {
