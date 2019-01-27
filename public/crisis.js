@@ -28,14 +28,14 @@
   let diningFlipChairEventDelay = 1;
   let diningCheckLiftEventDelay = 1;
   let diningLiftBaseTickReward = 25;
-  let diningBaseCounterTickDecrement = 1;
+  let diningBaseCounterTickDecrement = 0;
   let diningKnockedCounterTickDecrement = 2;
 
   // kid
   let kidBaseCounterTicks = 50.0;
   let kidRewardTicksForCorrect = 5;
   let kidRewardTicksForInCorrect = 1;
-  let kidDrawPickedEventDelay = 1;
+  let kidDrawPickedEventDelay = 0;
   let kidHidePickedEventDelay = 1;
   let kidHideOutputsEventDelay = 1;
   let kidNeedsEventDelay = 0;
@@ -45,7 +45,7 @@
 
   // game vars
   let gameTime = (new Date()).getTime();
-  let tickMillis = 250;
+  let tickMillis = 100;
   let timeScale = 1000 / tickMillis;
 
   // game view
@@ -337,6 +337,7 @@
       setup: function() {
         setupOutputs(this);
         setupInputs(this);
+        hideInputs(this);
         this.scheduleKnockdown();
       },
       activateRoom: function() {
@@ -727,28 +728,28 @@
   }
 
   function showInputs(room) {
-    this.console.log("show inputs:", room.id);
+    console.log("show inputs:", room.id);
     for (let i = 0; i < room.inputs.length; i++) {
       room.inputs[i].display.show();
     }
   }
 
   function hideInputs(room) {
-    this.console.log("hide inputs:", room.id);
+    console.log("hide inputs:", room.id);
     for (let i = 0; i < room.inputs.length; i++) {
       room.inputs[i].display.hide();
     }
   }
 
   function showOutputs(room) {
-    this.console.log("show outputs:", room.id);
+    console.log("show outputs:", room.id);
     for (let i = 0; i < room.outputs.length; i++) {
       room.outputs[i].display.show();
     }
   }
 
   function hideOutputs(room) {
-    this.console.log("hide outputs:", room.id);
+    console.log("hide outputs:", room.id);
     for (let i = 0; i < room.outputs.length; i++) {
       room.outputs[i].display.hide();
     }
@@ -844,7 +845,7 @@
     console.log(delta);
     console.log(timeTally);
     timeTally = timeTally + delta;
-    scoreTimer.html(`${(timeTally/1000/60).toFixed(0)}m ${((timeTally/1000)%60).toFixed(0)}.${((timeTally)%1000).toFixed(0)}s `);
+    scoreTimer.html(`${(Math.floor(timeTally/1000/60)).toFixed(0)}m ${((timeTally/1000)%60).toFixed(0)}.${((timeTally)%1000).toFixed(0)}s `);
   }
 
   function updateTimers(room) {
@@ -852,8 +853,11 @@
   }
 
   function processEvents() {
+    //console.log('length', events.length);
     for (let eventIndex = 0; eventIndex < events.length; eventIndex++) {
       let event = events.shift();
+      //console.log('action', event.action);
+      //console.log('event ticks:', event.ticks);
       if (event.ticks > 0) {
         event.ticks--;
         events.push(event);
