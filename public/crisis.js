@@ -182,7 +182,7 @@
         "talk-event": {
           ticks: loungeTalkEventDelay * timeScale,
           action: function () {
-            console.log("talk event!")
+            console.log("talk event!");
             this.room.outputs[0].display.show();
             modifyRoomScore(this.room, this.room.calculateScore());
             this.room.roomUpkeep();
@@ -380,6 +380,7 @@
             } else {
               showInputs(this.room);
               this.room.outputs[0].display.addClass('rotated-chair');
+              this.room.outputs[0].display.css("--rotate-angle", '97deg');
               this.room.knockedOver = true;
               this.room.scheduleLift();
             }
@@ -400,13 +401,16 @@
             } else {
               // console.log('persist');
               this.room.scheduleLift();
-              let rotationPerClick = 97/diningLiftCounterThreshold;
-              let newRotation = 97 - this.room.liftCounter * rotationPerClick +'deg';
-              // this.room.outputs[0].style.setProperty(newRotation)
-              console.log(newRotation);
+              // let rotationPerClick = 97/diningLiftCounterThreshold;
+              // let newRotation = 97 - this.liftCounter * rotationPerClick +'deg';
+              // this.room.outputs[0].display.css("--rotate-angle", newRotation);
+              // let rotationPerClick = 97/diningLiftCounterThreshold;
+              // let newRotation = 97 - this.room.liftCounter * rotationPerClick +'deg';
+              // this.room.outputs[0].display.css("--rotate-angle", newRotation);
+              // console.log(newRotation);
             }
           }
-        }
+        },
         'rotate-chair' : {
           ticks: 1,
           action: function() {
@@ -414,7 +418,7 @@
             // console.log(this.room.name);
             // this.room.outputs[0].display.removeClass('knocked-chair');
             // this.room.outputs[0].display.addClass('rotated-chair');
-          }
+          },
         },
       },
       scheduleKnockdown: function() {
@@ -432,6 +436,10 @@
         this.liftCounter++;
         // let rotateChairEvent = $.extend({}, this.events["rotate-chair"]);
         // events.push(rotateChairEvent);
+        let rotationPerClick = 97/diningLiftCounterThreshold;
+        let newRotation = 97 - this.liftCounter * rotationPerClick +'deg';
+        this.outputs[0].display.css("--rotate-angle", newRotation);
+        // console.log(newRotation);
         // console.log(this.liftCounter);
       },
       setup: function() {
