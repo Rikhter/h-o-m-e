@@ -1,7 +1,7 @@
 
 (function() {
 
-  let baseTime = 50.0;
+  let baseTime = 5000000.0;
 
   // lounge
   let loungeBaseCounterValue = baseTime;
@@ -28,7 +28,7 @@
   let diningBaseCounterValue = baseTime;
   let diningInitialLiftCounter = 0;
   let diningLiftCounterThreshold = 23;
-  let diningFlippedIntervalTickDelays = [10, 15, 15, 20, 20, 20, 25, 25, 30];
+  let diningFlippedIntervalTickDelays = [2, 3];
   let diningFlipChairEventDelay = 1;
   let diningCheckLiftEventDelay = 1;
   let diningLiftBaseTickReward = 18;
@@ -379,7 +379,7 @@
               this.room.scheduleKnockdown();
             } else {
               showInputs(this.room);
-              this.room.outputs[0].display.addClass('knocked-chair');
+              this.room.outputs[0].display.addClass('rotated-chair');
               this.room.knockedOver = true;
               this.room.scheduleLift();
             }
@@ -393,16 +393,29 @@
               console.log('release');
               this.room.liftCounter = diningInitialLiftCounter;
               modifyRoomScore(this.room, diningLiftBaseTickReward * timeScale);
-              this.room.outputs[0].display.removeClass('knocked-chair');
+              this.room.outputs[0].display.removeClass('rotated-chair');
               hideInputs(this.room);
               this.room.knockedOver = false;
               this.room.scheduleKnockdown();
             } else {
-              console.log('persist');
+              // console.log('persist');
               this.room.scheduleLift();
+              let rotationPerClick = 97/diningLiftCounterThreshold;
+              let newRotation = 97 - this.room.liftCounter * rotationPerClick +'deg';
+              // this.room.outputs[0].style.setProperty(newRotation)
+              console.log(newRotation);
             }
           }
         }
+        'rotate-chair' : {
+          ticks: 1,
+          action: function() {
+            console.log('rotate-chair');
+            // console.log(this.room.name);
+            // this.room.outputs[0].display.removeClass('knocked-chair');
+            // this.room.outputs[0].display.addClass('rotated-chair');
+          }
+        },
       },
       scheduleKnockdown: function() {
         let knockEvent = $.extend({}, this.events["knockdown-chair"]);
@@ -417,7 +430,9 @@
       },
       inputCall: function(room, input) {
         this.liftCounter++;
-        console.log(this.liftCounter);
+        // let rotateChairEvent = $.extend({}, this.events["rotate-chair"]);
+        // events.push(rotateChairEvent);
+        // console.log(this.liftCounter);
       },
       setup: function() {
         setupOutputs(this);
@@ -433,7 +448,7 @@
 
       },
       update: function (delta, active) {
-        console.log(this.name, this.counter + " : " + this.active);
+        // console.log(this.name, this.counter + " : " + this.active);
         if (this.knockedOver) {
           this.counter = this.counter - this.knockedDecrement;
         } else {
@@ -674,7 +689,7 @@
 
       },
       update: function (delta, active) {
-        console.log(this.name, this.counter + " : " + this.active);
+        // console.log(this.name, this.counter + " : " + this.active);
         if (!this.active) {
           this.counter = this.counter - kidBaseDecrementTick;
         }
@@ -916,8 +931,8 @@
 
   let timeTally = 0;
   function updateScoreTimer(delta) {
-    console.log(delta);
-    console.log(timeTally);
+    // console.log(delta);
+    // console.log(timeTally);
     timeTally = timeTally + delta;
     scoreTimer.html(`${(Math.floor(timeTally/1000/60)).toFixed(0)}m ${((timeTally/1000)%60).toFixed(0)}.${((timeTally)%1000).toFixed(0)}s `);
   }

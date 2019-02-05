@@ -89,3 +89,17 @@ h3 {
   -o-transform-origin: bottom;
   transform-origin: bottom;
 }
+
+.rotated-chair {
+  --rotate-angle: 97deg;
+  -webkit-transform: rotate(var(--rotate-angle));
+  -moz-transform: rotate(var(--rotate-angle));
+  -ms-transform: rotate(var(--rotate-angle));
+  -o-transform: rotate(var(--rotate-angle));
+  transform: rotate(var(--rotate-angle));
+  -webkit-transform-origin: bottom;
+  -moz-transform-origin: bottom;
+  -ms-transform-origin: bottom;
+  -o-transform-origin: bottom;
+  transform-origin: bottom;
+}
