@@ -1,4 +1,52 @@
 
+var images = [];
+function preload() {
+  for (var i = 0; i < arguments.length; i++) {
+    images[i] = new Image();
+    images[i].src = preload.arguments[i];
+  }
+}
+
+preload(
+    "./assets/dining-backdrop.png",
+    "./assets/dining-characters.png",
+    "./assets/dining-icon-arrow.png",
+    "./assets/dining-icon-chair.png",
+    "./assets/dining-icon-heart.png",
+    "./assets/kids-backdrop.png",
+    "./assets/kids-characters.png",
+    "./assets/kids-icon-a.png",
+    "./assets/kids-icon-b.png",
+    "./assets/kids-icon-blocks.png",
+    "./assets/kids-icon-c.png",
+    "./assets/kids-icon-car.png",
+    "./assets/kids-icon-cat.png",
+    "./assets/kids-icon-d.png",
+    "./assets/kids-icon-dummy.png",
+    "./assets/kids-icon-e.png",
+    "./assets/kids-icon-f.png",
+    "./assets/kids-icon-handle.png",
+    "./assets/kids-icon-sock.png",
+    "./assets/kids-speech.png",
+    "./assets/kitchen-backdrop.png",
+    "./assets/kitchen-characters.png",
+    "./assets/kitchen-icon-boiling.png",
+    "./assets/kitchen-icon-fire.png",
+    "./assets/kitchen-icon-heart.png",
+    "./assets/kitchen-icon-pot.png",
+    "./assets/lounge-backdrop.png",
+    "./assets/lounge-characters.png",
+    "./assets/lounge-icon-dining.png",
+    "./assets/lounge-icon-heart.png",
+    "./assets/lounge-icon-kids.png",
+    "./assets/lounge-icon-pot.png",
+    "./assets/lounge-speech.png",
+    "./assets/run-left.png",
+    "./assets/run-right.png",
+    "./assets/title-image.png",
+    "./assets/toilet-backdrop.png"
+);
+
 (function() {
 
   let baseTime = 50.0;
